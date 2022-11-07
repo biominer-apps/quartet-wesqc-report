@@ -49,15 +49,14 @@
         },
         {
             "tmplType": "file",
-            "label": "Reference Bed Dict",
-            "model": "reference_bed_dict",
+            "label": "Bed File",
+            "model": "bed",
             "readOnly": false,
             "multiple": false,
-            "filterType": ".dict",
-            "question": "A sequence dictionary for a reference sequence.",
-            "placeholder": "A sequence dictionary for a reference sequence.",
+            "filterType": ".bed",
+            "question": "A bed file for your wes data.",
+            "placeholder": "A bed file for your wes data.",
             "config": {
-                "initialValue": "oss://pgx-reference-data/GRCh38.d1.vd1/GRCh38.d1.vd1.dict",
                 "rules": [
                     {
                         "required": true,

@@ -12,6 +12,7 @@
   "{{ project_name }}.disk_size": "{{ disk_size }}",
   "{{ project_name }}.FASTQCdocker": "{{ FASTQCdocker }}",
   "{{ project_name }}.MULTIQCdocker": "{{ MULTIQCdocker }}",
+  "{{ project_name }}.bed": "{{ bed }}",
   "{{ project_name }}.reference_bed_dict": "{{ reference_bed_dict }}",
   "{{ project_name }}.fastq_2_M8": "{{ fastq_2_M8 }}",
   "{{ project_name }}.project": "{{ project_name }}",
