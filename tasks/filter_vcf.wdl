@@ -27,7 +27,7 @@
 		dataDisk: "cloud_ssd " + disk_size + " /cromwell_root/"
 	}
 	output {
-		File filtered_vcf = "${project}.chrom.bed.filtered.vcf"
+		File filtered_vcf = "${project}.${sample}.chrom.bed.filtered.vcf"
 		File filtered_bed = "benchmark_region_query_bed.bed"
 	}
 }
