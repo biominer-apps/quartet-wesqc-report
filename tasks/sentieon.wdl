@@ -49,6 +49,6 @@ task sentieon {
 		File is_metrics_header = "is_metrics.header"
 		File is_metrics_data = "${sample}.is_metrics"
 		File hs_metrics_header = "hs_metrics.header"
-		File hs_metrics_data = "${sample}.hs_metrics"		
+		File hs_metrics_data = "${sample}.hs_mtrics"		
 	}
 }
