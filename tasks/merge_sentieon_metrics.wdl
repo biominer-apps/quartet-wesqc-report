@@ -47,6 +47,6 @@ task merge_sentieon_metrics {
 		File wgs_metrics_summary = "${project}.wgs_metrics_data.txt"
 		File aln_metrics_summary = "${project}.aln_metrics.txt"
 		File is_metrics_summary = "${project}.is_metrics.txt"
-		File hs_metrics_summary = "${project.hs_metrics.txt"
+		File hs_metrics_summary = "${project}.hs_metrics.txt"
 	}
 }
