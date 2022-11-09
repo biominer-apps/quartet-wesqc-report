@@ -16,7 +16,7 @@ task extract_tables {
 	String disk_size
 
 	command <<<
-		python /opt/extract_tables.py -quality ${quality_yield_summary} -depth ${wgs_metrics_summary} -aln ${aln_metrics_summary} -is ${is_metrics_summary} -fastqc ${fastqc} -fastqscreen ${fastqscreen} -hap ${hap} -project ${project} -hs {hs_metrics_summary}
+		python /opt/extract_tables.py -quality ${quality_yield_summary} -depth ${wgs_metrics_summary} -aln ${aln_metrics_summary} -is ${is_metrics_summary} -fastqc ${fastqc} -fastqscreen ${fastqscreen} -hap ${hap} -project ${project} -hs ${hs_metrics_summary}
 	>>>
 
 	runtime {
