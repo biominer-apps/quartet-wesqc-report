@@ -27,6 +27,7 @@ if args.quality_yield:
 	wgs_metrics_file = args.wgs_metrics
 	aln_metrics_file = args.aln_metrics
 	is_metrics_file = args.is_metrics
+	hs_metrics_file = args.hs_metrics
 	fastqc_file = args.fastqc
 	fastqscreen_file = args.fastqscreen
 	hap_file = args.happy
@@ -73,6 +74,7 @@ if args.quality_yield:
 	wgs_metrics['PCT_20X'] = wgs_metrics['PCT_20X'] * 100
 	wgs_metrics['PCT_30X'] = wgs_metrics['PCT_30X'] * 100
 	wgs_metrics['Sample'] = [x[-1] for x in wgs_metrics['Sample'].str.split('/')]
+	dat = pd.read_table(hs_metrics_file,index_col=False)
 	hs_metrics = dat[['Sample','FOLD_80_BASE_PENALTY','PCT_USABLE_BASES_ON_TARGET']]
 	data_frames = [aln_metrics, is_metrics, quality_yield, wgs_metrics, hs_metrics]
 	post_alignment_dat = reduce(lambda  left,right: pd.merge(left,right,on=['Sample'],how='outer'), data_frames)
@@ -86,23 +88,29 @@ if args.quality_yield:
 	dat =pd.DataFrame.from_records(happy)
 	dat = dat.loc[:, dat.columns.str.endswith('ALL')]
 	dat_transposed = dat.T
-	dat_transposed = dat_transposed.loc[:,['sample_id','QUERY.TOTAL','METRIC.Precision','METRIC.Recall']]
+	dat_transposed = dat_transposed.loc[:,['sample_id','TRUTH.FN','QUERY.TOTAL','QUERY.FP','QUERY.UNK','METRIC.Precision','METRIC.Recall','METRIC.F1_Score']]
+	dat_transposed['QUERY.TP'] = dat_transposed['QUERY.TOTAL'].astype(int) - dat_transposed['QUERY.UNK'].astype(int) - dat_transposed['QUERY.FP'].astype(int)
+	dat_transposed['QUERY'] =dat_transposed['QUERY.TOTAL'].astype(int) - dat_transposed['QUERY.UNK'].astype(int)
 	indel = dat_transposed[['INDEL' in s for s in dat_transposed.index]]
 	snv = dat_transposed[['SNP' in s for s in dat_transposed.index]]
 	indel.reset_index(drop=True, inplace=True)
 	snv.reset_index(drop=True, inplace=True)
 	benchmark = pd.concat([snv, indel], axis=1)
-	benchmark = benchmark[["sample_id", 'QUERY.TOTAL', 'METRIC.Precision', 'METRIC.Recall']]
-	benchmark.columns = ['Sample','sample_id','SNV number','INDEL number','SNV precision','INDEL precision','SNV recall','INDEL recall']
-	benchmark = benchmark[['Sample','SNV number','INDEL number','SNV precision','INDEL precision','SNV recall','INDEL recall']]
+	benchmark = benchmark[["sample_id", 'QUERY.TOTAL', 'QUERY','QUERY.TP','QUERY.FP','TRUTH.FN','METRIC.Precision', 'METRIC.Recall','METRIC.F1_Score']]
+	benchmark.columns = ['Sample','sample_id','SNV number','INDEL number','SNV query','INDEL query','SNV TP','INDEL TP','SNV FP','INDEL FP','SNV FN','INDEL FN','SNV precision','INDEL precision','SNV recall','INDEL recall','SNV F1','INDEL F1']
+	benchmark = benchmark[['Sample','SNV number','INDEL number','SNV query','INDEL query','SNV TP','INDEL TP','SNV FP','INDEL FP','SNV FN','INDEL FN','SNV precision','INDEL precision','SNV recall','INDEL recall','SNV F1','INDEL F1']]
 	benchmark['SNV precision'] = benchmark['SNV precision'].astype(float)
 	benchmark['INDEL precision'] = benchmark['INDEL precision'].astype(float)
 	benchmark['SNV recall'] = benchmark['SNV recall'].astype(float)
 	benchmark['INDEL recall'] = benchmark['INDEL recall'].astype(float)
+	benchmark['SNV F1'] = benchmark['SNV F1'].astype(float)
+	benchmark['INDEL F1'] = benchmark['INDEL F1'].astype(float)
 	benchmark['SNV precision'] = benchmark['SNV precision'] * 100
 	benchmark['INDEL precision'] = benchmark['INDEL precision'] * 100
 	benchmark['SNV recall'] = benchmark['SNV recall'] * 100
 	benchmark['INDEL recall'] = benchmark['INDEL recall']* 100
+	benchmark['SNV F1'] = benchmark['SNV F1'] * 100
+	benchmark['INDEL F1'] = benchmark['INDEL F1'] * 100
 	benchmark = benchmark.round(2)
 	benchmark.to_csv('variants.calling.qc.txt',sep="\t",index=0)
 else:
@@ -112,23 +120,29 @@ else:
 	dat =pd.DataFrame.from_records(happy)
 	dat = dat.loc[:, dat.columns.str.endswith('ALL')]
 	dat_transposed = dat.T
-	dat_transposed = dat_transposed.loc[:,['sample_id','QUERY.TOTAL','METRIC.Precision','METRIC.Recall']]
+	dat_transposed = dat_transposed.loc[:,['sample_id','TRUTH.FN','QUERY.TOTAL','QUERY.FP','QUERY.UNK','METRIC.Precision','METRIC.Recall','METRIC.F1_Score']]
+	dat_transposed['QUERY.TP'] = dat_transposed['QUERY.TOTAL'].astype(int) - dat_transposed['QUERY.UNK'].astype(int) - dat_transposed['QUERY.FP'].astype(int)
+	dat_transposed['QUERY'] =dat_transposed['QUERY.TOTAL'].astype(int) - dat_transposed['QUERY.UNK'].astype(int)
 	indel = dat_transposed[['INDEL' in s for s in dat_transposed.index]]
 	snv = dat_transposed[['SNP' in s for s in dat_transposed.index]]
 	indel.reset_index(drop=True, inplace=True)
 	snv.reset_index(drop=True, inplace=True)
 	benchmark = pd.concat([snv, indel], axis=1)
-	benchmark = benchmark[["sample_id", 'QUERY.TOTAL', 'METRIC.Precision', 'METRIC.Recall']]
-	benchmark.columns = ['Sample','sample_id','SNV number','INDEL number','SNV precision','INDEL precision','SNV recall','INDEL recall']
-	benchmark = benchmark[['Sample','SNV number','INDEL number','SNV precision','INDEL precision','SNV recall','INDEL recall']]
+	benchmark = benchmark[["sample_id", 'QUERY.TOTAL', 'QUERY','QUERY.TP','QUERY.FP','TRUTH.FN','METRIC.Precision', 'METRIC.Recall','METRIC.F1_Score']]
+	benchmark.columns = ['Sample','sample_id','SNV number','INDEL number','SNV query','INDEL query','SNV TP','INDEL TP','SNV FP','INDEL FP','SNV FN','INDEL FN','SNV precision','INDEL precision','SNV recall','INDEL recall','SNV F1','INDEL F1']
+	benchmark = benchmark[['Sample','SNV number','INDEL number','SNV query','INDEL query','SNV TP','INDEL TP','SNV FP','INDEL FP','SNV FN','INDEL FN','SNV precision','INDEL precision','SNV recall','INDEL recall','SNV F1','INDEL F1']]
 	benchmark['SNV precision'] = benchmark['SNV precision'].astype(float)
 	benchmark['INDEL precision'] = benchmark['INDEL precision'].astype(float)
 	benchmark['SNV recall'] = benchmark['SNV recall'].astype(float)
 	benchmark['INDEL recall'] = benchmark['INDEL recall'].astype(float)
+	benchmark['SNV F1'] = benchmark['SNV F1'].astype(float)
+	benchmark['INDEL F1'] = benchmark['INDEL F1'].astype(float)
 	benchmark['SNV precision'] = benchmark['SNV precision'] * 100
 	benchmark['INDEL precision'] = benchmark['INDEL precision'] * 100
 	benchmark['SNV recall'] = benchmark['SNV recall'] * 100
 	benchmark['INDEL recall'] = benchmark['INDEL recall']* 100
+	benchmark['SNV F1'] = benchmark['SNV F1'] * 100
+	benchmark['INDEL F1'] = benchmark['INDEL F1'] * 100
 	benchmark = benchmark.round(2)
 	benchmark.to_csv('variants.calling.qc.txt',sep="\t",index=0)
 	

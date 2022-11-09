@@ -25,6 +25,6 @@
   "db_mills": "Mills_and_1000G_gold_standard.indels.hg38.vcf",
   "dbsnp": "dbsnp_146.hg38.vcf",
   "MENDELIANdocker": "registry-vpc.cn-shanghai.aliyuncs.com/pgx-docker-registry/vbt:v1.1",
-  "DIYdocker": "registry-vpc.cn-shanghai.aliyuncs.com/pgx-docker-registry/high_confidence_call_manuscript:v1.4",
+  "DIYdocker": "registry-vpc.cn-shanghai.aliyuncs.com/pgx-docker-registry/high_confidence_call_manuscript:1.5",
   "ref_dir": "oss://pgx-reference-data/GRCh38.d1.vd1/"
 }
