@@ -4,6 +4,7 @@ task Haplotyper {
 	String SENTIEON_INSTALL_DIR
 	String fasta
 	File recaled_bam
+	String SENTIEON_LICENSE
 	File recaled_bam_index
 	String sample = basename(recaled_bam,".sorted.deduped.realigned.recaled.bam")
 	String docker
@@ -13,7 +14,7 @@ task Haplotyper {
 command <<<
 		set -o pipefail
 		set -e
-		export SENTIEON_LICENSE=192.168.0.55:8990
+		export SENTIEON_LICENSE=${SENTIEON_LICENSE}
 		nt=$(nproc)	
 		${SENTIEON_INSTALL_DIR}/bin/sentieon driver -r ${ref_dir}/${fasta} -t $nt -i ${recaled_bam} --algo Haplotyper ${sample}_hc.vcf
 	>>>

@@ -15,7 +15,7 @@ task bed_to_interval_list {
        cp ${ref_dir}/${fasta} /cromwell_root/tmp/
        cp ${reference_bed_dict} /cromwell_root/tmp/          
                   
-       java -jar /usr/picard/picard.jar BedToIntervalList \
+       picard BedToIntervalList \
        I=${bed} \
        O=${interval_list_name}.txt \
        SD=/cromwell_root/tmp/GRCh38.d1.vd1.dict

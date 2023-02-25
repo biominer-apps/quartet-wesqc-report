@@ -45,16 +45,7 @@ workflow {{ project_name }} {
 
 	String SENTIEON_INSTALL_DIR
 	String SENTIEON_LICENSE
-	String SENTIEONdocker
-	String FASTQCdocker
-	String FASTQSCREENdocker
-	String QUALIMAPdocker
-	String BENCHMARKdocker
-	String MENDELIANdocker
-	String DIYdocker
-	String MULTIQCdocker
-	String BEDTOOLSdocker
-	String PICARDdocker
+	String docker
 
 	String fasta
 	File ref_dir
@@ -85,7 +76,7 @@ workflow {{ project_name }} {
 			fasta=fasta,
 			interval_list_name=project,
 			reference_bed_dict=reference_bed_dict,
-			docker=PICARDdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -102,7 +93,7 @@ workflow {{ project_name }} {
 			group=project,
 			sample='LCL5',
 			project=project,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -113,7 +104,7 @@ workflow {{ project_name }} {
 			read2=fastq_2_D5,
 			project=project,
 			sample="LCL5",
-			docker=FASTQCdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -126,7 +117,7 @@ workflow {{ project_name }} {
 			sample="LCL5",
 			screen_ref_dir=screen_ref_dir,
 			fastq_screen_conf=fastq_screen_conf,
-			docker=FASTQSCREENdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -134,9 +125,10 @@ workflow {{ project_name }} {
 		call Dedup.Dedup as Dedup_D5 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			sorted_bam=mapping_D5.sorted_bam,
 			sorted_bam_index=mapping_D5.sorted_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -146,7 +138,7 @@ workflow {{ project_name }} {
 			bam=Dedup_D5.Dedup_bam,
 			bai=Dedup_D5.Dedup_bam_index,
 			bed=bed,
-			docker=QUALIMAPdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}		
@@ -154,12 +146,13 @@ workflow {{ project_name }} {
 		call deduped_Metrics.deduped_Metrics as deduped_Metrics_D5 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			bed=bed,
 			Dedup_bam=Dedup_D5.Dedup_bam,
 			Dedup_bam_index=Dedup_D5.Dedup_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			interval_list=bed_to_interval_list.interval_list,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
@@ -172,7 +165,7 @@ workflow {{ project_name }} {
 			aln_metrics=deduped_Metrics_D5.dedeuped_aln_metrics,
 			is_metrics=deduped_Metrics_D5.deduped_is_metrics,
 			hs_metrics=deduped_Metrics_D5.deduped_hsmetrics,
-			docker=SENTIEONdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size		
 		}
@@ -180,13 +173,14 @@ workflow {{ project_name }} {
 		call Realigner.Realigner as Realigner_D5 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			Dedup_bam=Dedup_D5.Dedup_bam,
 			Dedup_bam_index=Dedup_D5.Dedup_bam_index,
 			db_mills=db_mills,
 			dbmills_dir=dbmills_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -194,6 +188,7 @@ workflow {{ project_name }} {
 		call BQSR.BQSR as BQSR_D5 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			realigned_bam=Realigner_D5.realigner_bam,
@@ -202,7 +197,7 @@ workflow {{ project_name }} {
 			dbmills_dir=dbmills_dir,
 			dbsnp=dbsnp,
 			dbsnp_dir=dbsnp_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -210,11 +205,12 @@ workflow {{ project_name }} {
 		call Haplotyper.Haplotyper as Haplotyper_D5 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			recaled_bam=BQSR_D5.recaled_bam,
 			recaled_bam_index=BQSR_D5.recaled_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -222,7 +218,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_D5 {
 			input:
 			vcf=Haplotyper_D5.vcf,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			benchmark_region=benchmark_region,
 			project=project,
@@ -237,7 +233,7 @@ workflow {{ project_name }} {
 			ref_dir=ref_dir,
 			bed=filter_vcf_D5.filtered_bed,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}		
@@ -254,7 +250,7 @@ workflow {{ project_name }} {
 			group=project,
 			sample='LCL6',
 			project=project,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -265,7 +261,7 @@ workflow {{ project_name }} {
 			read2=fastq_2_D6,
 			project=project,
 			sample="LCL6",
-			docker=FASTQCdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -278,7 +274,7 @@ workflow {{ project_name }} {
 			sample="LCL6",
 			screen_ref_dir=screen_ref_dir,
 			fastq_screen_conf=fastq_screen_conf,
-			docker=FASTQSCREENdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -286,9 +282,10 @@ workflow {{ project_name }} {
 		call Dedup.Dedup as Dedup_D6 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			sorted_bam=mapping_D6.sorted_bam,
 			sorted_bam_index=mapping_D6.sorted_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -298,7 +295,7 @@ workflow {{ project_name }} {
 			bam=Dedup_D6.Dedup_bam,
 			bai=Dedup_D6.Dedup_bam_index,
 			bed=bed,
-			docker=QUALIMAPdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}		
@@ -306,13 +303,14 @@ workflow {{ project_name }} {
 		call deduped_Metrics.deduped_Metrics as deduped_Metrics_D6 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			bed=bed,
 			Dedup_bam=Dedup_D6.Dedup_bam,
 			Dedup_bam_index=Dedup_D6.Dedup_bam_index,
 			interval_list=bed_to_interval_list.interval_list,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -324,7 +322,7 @@ workflow {{ project_name }} {
 			aln_metrics=deduped_Metrics_D6.dedeuped_aln_metrics,
 			is_metrics=deduped_Metrics_D6.deduped_is_metrics,
 			hs_metrics=deduped_Metrics_D6.deduped_hsmetrics,
-			docker=SENTIEONdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size		
 		}
@@ -332,13 +330,14 @@ workflow {{ project_name }} {
 		call Realigner.Realigner as Realigner_D6 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			Dedup_bam=Dedup_D6.Dedup_bam,
 			Dedup_bam_index=Dedup_D6.Dedup_bam_index,
 			db_mills=db_mills,
 			dbmills_dir=dbmills_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -346,6 +345,7 @@ workflow {{ project_name }} {
 		call BQSR.BQSR as BQSR_D6 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			realigned_bam=Realigner_D6.realigner_bam,
@@ -354,7 +354,7 @@ workflow {{ project_name }} {
 			dbmills_dir=dbmills_dir,
 			dbsnp=dbsnp,
 			dbsnp_dir=dbsnp_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -362,11 +362,12 @@ workflow {{ project_name }} {
 		call Haplotyper.Haplotyper as Haplotyper_D6 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			recaled_bam=BQSR_D6.recaled_bam,
 			recaled_bam_index=BQSR_D6.recaled_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -374,7 +375,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_D6 {
 			input:
 			vcf=Haplotyper_D6.vcf,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			benchmark_region=benchmark_region,
 			project=project,
@@ -389,7 +390,7 @@ workflow {{ project_name }} {
 			ref_dir=ref_dir,
 			bed=filter_vcf_D6.filtered_bed,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -406,7 +407,7 @@ workflow {{ project_name }} {
 			group=project,
 			sample='LCL7',
 			project=project,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -417,7 +418,7 @@ workflow {{ project_name }} {
 			read2=fastq_2_F7,
 			project=project,
 			sample="LCL7",
-			docker=FASTQCdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -430,7 +431,7 @@ workflow {{ project_name }} {
 			sample="LCL7",
 			screen_ref_dir=screen_ref_dir,
 			fastq_screen_conf=fastq_screen_conf,
-			docker=FASTQSCREENdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -438,9 +439,10 @@ workflow {{ project_name }} {
 		call Dedup.Dedup as Dedup_F7 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			sorted_bam=mapping_F7.sorted_bam,
 			sorted_bam_index=mapping_F7.sorted_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -450,7 +452,7 @@ workflow {{ project_name }} {
 			bam=Dedup_F7.Dedup_bam,
 			bai=Dedup_F7.Dedup_bam_index,
 			bed=bed,
-			docker=QUALIMAPdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}		
@@ -458,13 +460,14 @@ workflow {{ project_name }} {
 		call deduped_Metrics.deduped_Metrics as deduped_Metrics_F7 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			bed=bed,
 			Dedup_bam=Dedup_F7.Dedup_bam,
 			Dedup_bam_index=Dedup_F7.Dedup_bam_index,
 			interval_list=bed_to_interval_list.interval_list,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -476,7 +479,7 @@ workflow {{ project_name }} {
 			aln_metrics=deduped_Metrics_F7.dedeuped_aln_metrics,
 			is_metrics=deduped_Metrics_F7.deduped_is_metrics,
 			hs_metrics=deduped_Metrics_F7.deduped_hsmetrics,
-			docker=SENTIEONdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size		
 		}
@@ -484,13 +487,14 @@ workflow {{ project_name }} {
 		call Realigner.Realigner as Realigner_F7 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			Dedup_bam=Dedup_F7.Dedup_bam,
 			Dedup_bam_index=Dedup_F7.Dedup_bam_index,
 			db_mills=db_mills,
 			dbmills_dir=dbmills_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -498,6 +502,7 @@ workflow {{ project_name }} {
 		call BQSR.BQSR as BQSR_F7 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			realigned_bam=Realigner_F7.realigner_bam,
@@ -506,7 +511,7 @@ workflow {{ project_name }} {
 			dbmills_dir=dbmills_dir,
 			dbsnp=dbsnp,
 			dbsnp_dir=dbsnp_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -514,11 +519,12 @@ workflow {{ project_name }} {
 		call Haplotyper.Haplotyper as Haplotyper_F7 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			recaled_bam=BQSR_F7.recaled_bam,
 			recaled_bam_index=BQSR_F7.recaled_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -526,7 +532,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_F7 {
 			input:
 			vcf=Haplotyper_F7.vcf,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			project=project,
 			benchmark_region=benchmark_region,
@@ -541,7 +547,7 @@ workflow {{ project_name }} {
 			ref_dir=ref_dir,
 			bed=filter_vcf_F7.filtered_bed,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -558,7 +564,7 @@ workflow {{ project_name }} {
 			group=project,
 			project=project,
 			sample='LCL8',
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -569,7 +575,7 @@ workflow {{ project_name }} {
 			read2=fastq_2_M8,
 			project=project,
 			sample="LCL8",
-			docker=FASTQCdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -582,7 +588,7 @@ workflow {{ project_name }} {
 			sample="LCL8",
 			screen_ref_dir=screen_ref_dir,
 			fastq_screen_conf=fastq_screen_conf,
-			docker=FASTQSCREENdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -590,9 +596,10 @@ workflow {{ project_name }} {
 		call Dedup.Dedup as Dedup_M8 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			sorted_bam=mapping_M8.sorted_bam,
 			sorted_bam_index=mapping_M8.sorted_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -601,7 +608,7 @@ workflow {{ project_name }} {
 			input:
 			bam=Dedup_M8.Dedup_bam,
 			bai=Dedup_M8.Dedup_bam_index,
-			docker=QUALIMAPdocker,
+			docker=docker,
 			bed=bed,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
@@ -610,13 +617,14 @@ workflow {{ project_name }} {
 		call deduped_Metrics.deduped_Metrics as deduped_Metrics_M8 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			bed=bed,
 			Dedup_bam=Dedup_M8.Dedup_bam,
 			Dedup_bam_index=Dedup_M8.Dedup_bam_index,
 			interval_list=bed_to_interval_list.interval_list,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -628,7 +636,7 @@ workflow {{ project_name }} {
 			aln_metrics=deduped_Metrics_M8.dedeuped_aln_metrics,
 			is_metrics=deduped_Metrics_M8.deduped_is_metrics,
 			hs_metrics=deduped_Metrics_M8.deduped_hsmetrics,
-			docker=SENTIEONdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size		
 		}
@@ -636,13 +644,14 @@ workflow {{ project_name }} {
 		call Realigner.Realigner as Realigner_M8 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			Dedup_bam=Dedup_M8.Dedup_bam,
 			Dedup_bam_index=Dedup_M8.Dedup_bam_index,
 			db_mills=db_mills,
 			dbmills_dir=dbmills_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -650,6 +659,7 @@ workflow {{ project_name }} {
 		call BQSR.BQSR as BQSR_M8 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			realigned_bam=Realigner_M8.realigner_bam,
@@ -658,7 +668,7 @@ workflow {{ project_name }} {
 			dbmills_dir=dbmills_dir,
 			dbsnp=dbsnp,
 			dbsnp_dir=dbsnp_dir,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -666,11 +676,12 @@ workflow {{ project_name }} {
 		call Haplotyper.Haplotyper as Haplotyper_M8 {
 			input:
 			SENTIEON_INSTALL_DIR=SENTIEON_INSTALL_DIR,
+			SENTIEON_LICENSE=SENTIEON_LICENSE,
 			fasta=fasta,
 			ref_dir=ref_dir,
 			recaled_bam=BQSR_M8.recaled_bam,
 			recaled_bam_index=BQSR_M8.recaled_bam_index,
-			docker=SENTIEONdocker,
+			docker=docker,
 			disk_size=disk_size,
 			cluster_config=BIGcluster_config
 		}
@@ -678,7 +689,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_M8 {
 			input:
 			vcf=Haplotyper_M8.vcf,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			project=project,
 			benchmark_region=benchmark_region,
@@ -693,7 +704,7 @@ workflow {{ project_name }} {
 			ref_dir=ref_dir,
 			bed=filter_vcf_M8.filtered_bed,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -716,7 +727,7 @@ workflow {{ project_name }} {
 			txt1=fastqscreen_txt1,
 			txt2=fastqscreen_txt2,
 			summary=benchmark_summary,
-			docker=MULTIQCdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -755,7 +766,7 @@ workflow {{ project_name }} {
 			is_metrics_data=sentieon_is_metrics_data,
 			hs_metrics_data=sentieon_hs_metrics_data,
 			project=project,
-			docker=MULTIQCdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size	
 		}
@@ -771,7 +782,7 @@ workflow {{ project_name }} {
 			fastqscreen=multiqc_big.fastqscreen,
 			hap=multiqc_big.hap,
 			project=project,
-			docker=DIYdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -787,7 +798,7 @@ workflow {{ project_name }} {
 			F7_vcf_tbi=benchmark_F7.rtg_vcf_index,
 			M8_vcf_tbi=benchmark_M8.rtg_vcf_index,
 			project=project,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size,
 		}
@@ -797,7 +808,7 @@ workflow {{ project_name }} {
 			family_vcf=merge_family.family_vcf,
 			ref_dir=ref_dir,
 			fasta=fasta,
-			docker=MENDELIANdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size		
 		}
@@ -807,7 +818,7 @@ workflow {{ project_name }} {
 			D5_trio_vcf=mendelian.D5_trio_vcf,
 			D6_trio_vcf=mendelian.D6_trio_vcf,
 			family_vcf=merge_family.family_vcf,
-			docker=DIYdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -821,7 +832,7 @@ workflow {{ project_name }} {
 			vcf_F7=vcf_F7,
 			vcf_M8=vcf_M8,
 			project=project,
-			docker=DIYdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -831,7 +842,7 @@ workflow {{ project_name }} {
 			bed=bed,
 			benchmark_region=benchmark_region,
 			project=project,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size			
 		}
@@ -843,7 +854,7 @@ workflow {{ project_name }} {
 			benchmarking_dir=benchmarking_dir,
 			ref_dir=ref_dir,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -851,7 +862,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_D6_vcf {
 			input:
 			vcf=rename_vcf.vcf_D6_renamed,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			benchmark_region=benchmark_region,
 			project=project,
@@ -866,7 +877,7 @@ workflow {{ project_name }} {
 			benchmarking_dir=benchmarking_dir,
 			ref_dir=ref_dir,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -874,7 +885,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_F7_vcf {
 			input:
 			vcf=rename_vcf.vcf_F7_renamed,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			benchmark_region=benchmark_region,
 			project=project,
@@ -889,7 +900,7 @@ workflow {{ project_name }} {
 			benchmarking_dir=benchmarking_dir,
 			ref_dir=ref_dir,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -897,7 +908,7 @@ workflow {{ project_name }} {
 		call filter_vcf.filter_vcf as filter_vcf_M8_vcf {
 			input:
 			vcf=rename_vcf.vcf_M8_renamed,
-			docker=BEDTOOLSdocker,
+			docker=docker,
 			bed=bed,
 			benchmark_region=benchmark_region,
 			project=project,
@@ -912,7 +923,7 @@ workflow {{ project_name }} {
 			benchmarking_dir=benchmarking_dir,
 			ref_dir=ref_dir,
 			fasta=fasta,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size
 		}
@@ -922,7 +933,7 @@ workflow {{ project_name }} {
 		call multiqc_hap.multiqc_hap as multiqc_hap {
 			input:
 			summary=benchmark_summary_hap,
-			docker=MULTIQCdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -931,7 +942,7 @@ workflow {{ project_name }} {
 			input:
 			hap=multiqc_hap.hap,
 			project=project,
-			docker=DIYdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}
@@ -947,7 +958,7 @@ workflow {{ project_name }} {
 			F7_vcf_tbi=benchmark_F7_vcf.rtg_vcf_index,
 			M8_vcf_tbi=benchmark_M8_vcf.rtg_vcf_index,
 			project=project,
-			docker=BENCHMARKdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size,
 		}
@@ -957,7 +968,7 @@ workflow {{ project_name }} {
 			family_vcf=merge_family_vcf.family_vcf,
 			ref_dir=ref_dir,
 			fasta=fasta,
-			docker=MENDELIANdocker,
+			docker=docker,
 			cluster_config=BIGcluster_config,
 			disk_size=disk_size		
 		}
@@ -967,7 +978,7 @@ workflow {{ project_name }} {
 			D5_trio_vcf=mendelian_vcf.D5_trio_vcf,
 			D6_trio_vcf=mendelian_vcf.D6_trio_vcf,
 			family_vcf=merge_family_vcf.family_vcf,
-			docker=DIYdocker,
+			docker=docker,
 			cluster_config=SMALLcluster_config,
 			disk_size=disk_size
 		}

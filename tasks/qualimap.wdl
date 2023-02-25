@@ -12,7 +12,7 @@ task qualimap {
 		set -e
 		nt=$(nproc)
 		awk 'BEGIN{OFS="\t"}{sub("\r","",$3);print $1,$2,$3,"",0,"."}' ${bed} > new.bed
-		/opt/qualimap/qualimap bamqc -bam ${bam} -gff new.bed -outformat PDF:HTML -nt $nt -outdir ${bamname} --java-mem-size=60G
+		qualimap bamqc -bam ${bam} -gff new.bed -outformat PDF:HTML -nt $nt -outdir ${bamname} --java-mem-size=60G
 
 		tar -zcvf ${bamname}_qualimap.zip ${bamname}
 	>>>

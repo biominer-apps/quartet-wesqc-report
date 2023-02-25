@@ -7,6 +7,7 @@ task deduped_Metrics {
 	File Dedup_bam
 	File Dedup_bam_index
 	File interval_list
+	String SENTIEON_LICENSE
 	String sample = basename(Dedup_bam,".sorted.deduped.bam")
 	String docker
 	String cluster_config
@@ -16,7 +17,7 @@ task deduped_Metrics {
 	command <<<
 		set -o pipefail
 		set -e
-		export SENTIEON_LICENSE=192.168.0.55:8990
+		export SENTIEON_LICENSE=${SENTIEON_LICENSE}
 		nt=$(nproc)
 		${SENTIEON_INSTALL_DIR}/bin/sentieon driver -r ${ref_dir}/${fasta} -t $nt -i ${Dedup_bam} --interval ${bed} --algo CoverageMetrics --omit_base_output ${sample}_deduped_coverage_metrics --algo MeanQualityByCycle ${sample}_deduped_mq_metrics.txt --algo QualDistribution ${sample}_deduped_qd_metrics.txt --algo GCBias --summary ${sample}_deduped_gc_summary.txt ${sample}_deduped_gc_metrics.txt --algo AlignmentStat ${sample}_deduped_aln_metrics.txt --algo InsertSizeMetricAlgo ${sample}_deduped_is_metrics.txt --algo QualityYield ${sample}_deduped_QualityYield.txt --algo WgsMetricsAlgo ${sample}_deduped_WgsMetricsAlgo.txt --algo HsMetricAlgo --targets_list ${interval_list} --baits_list ${interval_list} ${sample}_deduped_HsMetricAlgo.txt
 	>>>
