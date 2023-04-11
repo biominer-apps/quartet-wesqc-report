@@ -12,8 +12,10 @@ task bed_to_interval_list {
 
 	command <<<
        mkdir -p /cromwell_root/tmp
-       cp ${ref_dir}/${fasta} /cromwell_root/tmp/
-       cp ${reference_bed_dict} /cromwell_root/tmp/          
+       # cp ${ref_dir}/${fasta} /cromwell_root/tmp/
+       ln -sf ${ref_dir}/${fasta} /cromwell_root/tmp/
+       # cp ${reference_bed_dict} /cromwell_root/tmp/         
+       ln -sf ${reference_bed_dict} /cromwell_root/tmp/
                   
        picard BedToIntervalList \
        I=${bed} \

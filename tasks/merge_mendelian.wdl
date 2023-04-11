@@ -11,13 +11,13 @@ task merge_mendelian {
 		cat ${D5_trio_vcf} | grep -v '##' > ${family_name}.D5.txt
 		cat ${D6_trio_vcf} | grep -v '##' > ${family_name}.D6.txt
 		cat ${family_vcf} | grep -v '##' | awk '
-		    BEGIN { OFS = "\t" }
-		    NF > 2 && FNR > 1 { 
-		        for ( i=9; i<=NF; i++ ) { 
-		            split($i,a,":") ;$i = a[1];
-		        } 
-		    } 
-		    { print }
+            BEGIN { OFS = "\t" }
+            NF > 2 && FNR > 1 { 
+                for ( i=9; i<=NF; i++ ) { 
+                    split($i,a,":") ;$i = a[1];
+                } 
+            } 
+            { print }
 		' > ${family_name}.consensus.txt
 		/opt/conda/bin/python /venv/wes-workflow/codescripts/merge_two_family_with_genotype.py -LCL5 ${family_name}.D5.txt -LCL6 ${family_name}.D6.txt -genotype ${family_name}.consensus.txt -family ${family_name}
 	>>>

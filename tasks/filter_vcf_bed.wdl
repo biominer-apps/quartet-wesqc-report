@@ -1,4 +1,4 @@
- task filter_vcf_bed {
+task filter_vcf_bed {
 	File vcf
 	File? bed
 	File benchmark_region

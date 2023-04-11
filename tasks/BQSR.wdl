@@ -1,5 +1,5 @@
 task BQSR {
-	
+
     File ref_dir
     File dbsnp_dir
     File dbmills_dir

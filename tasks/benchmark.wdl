@@ -15,17 +15,17 @@ task benchmark {
 		set -e
 		nt=$(nproc)
 		mkdir -p /cromwell_root/tmp
-		cp -r ${ref_dir} /cromwell_root/tmp/
-		cp -r ${benchmarking_dir} /cromwell_root/tmp/
+		# cp -r ${ref_dir} /cromwell_root/tmp/
+		ln -sf ${ref_dir} /cromwell_root/tmp/
+		# cp -r ${benchmarking_dir} /cromwell_root/tmp/
+		ln -sf ${benchmarking_dir} /cromwell_root/tmp/
 
 		export HGREF=/cromwell_root/tmp/reference_data/GRCh38.d1.vd1.fa
-
 
 		echo -e "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tLCL5" > LCL5_name
 		echo -e "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tLCL6" > LCL6_name
 		echo -e "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tLCL7" > LCL7_name
 		echo -e "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tLCL8" > LCL8_name
-
 
 		if [[ ${sample} =~ "LCL5" ]];then
 			hap.py /cromwell_root/tmp/reference_datasets_v202103/LCL5.high.confidence.calls.vcf ${filtered_vcf} -f ${bed} --threads $nt -o ${sample} -r ${ref_dir}/${fasta}
@@ -35,7 +35,7 @@ task benchmark {
 			rtg bgzip LCL5.vcf -c > ${sample}.reformed.vcf.gz
 			rtg index -f vcf ${sample}.reformed.vcf.gz
 		elif [[ ${sample} =~ "LCL6" ]]; then
-		    hap.py /cromwell_root/tmp/reference_datasets_v202103/LCL6.high.confidence.calls.vcf ${filtered_vcf} -f ${bed} --threads $nt -o ${sample} -r ${ref_dir}/${fasta}
+            hap.py /cromwell_root/tmp/reference_datasets_v202103/LCL6.high.confidence.calls.vcf ${filtered_vcf} -f ${bed} --threads $nt -o ${sample} -r ${ref_dir}/${fasta}
 			cat ${filtered_vcf} | grep '##' > header
 			cat ${filtered_vcf} | grep -v '#' > body
 			cat header LCL6_name body > LCL6.vcf
