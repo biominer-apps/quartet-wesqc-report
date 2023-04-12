@@ -35,7 +35,6 @@ lcl6_dat = pd.read_table(lcl6)
 genotype_dat = pd.read_table(genotype)
 merged_df = pd.merge(lcl5_dat, lcl6_dat,  how='outer', left_on=['#CHROM','POS'], right_on = ['#CHROM','POS'])
 merged_genotype_df = pd.merge(merged_df, genotype_dat,  how='outer', left_on=['#CHROM','POS'], right_on = ['#CHROM','POS'])
-merged_genotype_df = merged_genotype_df.dropna()
 
 merged_genotype_df_sub = merged_genotype_df.iloc[:,[0,1,23,24,29,30,31,32,7,17]]
 merged_genotype_df_sub.columns = ['CHROM', 'POS', 'REF', 'ALT','LCL5','LCL6','LCL7','LCL8', 'TRIO5', 'TRIO6']
@@ -87,18 +86,18 @@ for row in merged_genotype_df_sub.itertuples():
 		else:
 			sister_count = "yes_diff"	
 	# family trio5
-	if row.LCL5 == row.LCL7 == row.LCL8 == './.':
+	if row.LCL5 == row. LCL7 == row.LCL8 == './.':
 		mendelian = mendelian + ':noInfo'
-	elif row.LCL5 == row.LCL7 == row.LCL8 == '0/0':
+	elif row.LCL5 == row. LCL7 == row.LCL8 == '0/0':
 		mendelian = mendelian + ':Ref'
 	elif pd.isnull(row.TRIO5) == True:
 		mendelian = mendelian + ':unVBT'
 	else:
 		mendelian = mendelian + ':' + row.TRIO5.split('=')[1]
 	# family trio6
-	if row.LCL6 == row.LCL7 == row.LCL8 == './.':
+	if row.LCL6 == row. LCL7 == row.LCL8 == './.':
 		mendelian = mendelian + ':noInfo'
-	elif row.LCL6 == row.LCL7 == row.LCL8 == '0/0':
+	elif row.LCL6 == row. LCL7 == row.LCL8 == '0/0':
 		mendelian = mendelian + ':Ref'
 	elif pd.isnull(row.TRIO6) == True:
 		mendelian = mendelian + ':unVBT'
@@ -109,7 +108,7 @@ for row in merged_genotype_df_sub.itertuples():
 		mendelian_count = "no"
 	else:
 		mendelian_count = "yes"
-	outline = str(row.CHROM) + '\t' + str(row.POS) + '\t' + str(row.REF) + '\t' + str(row.ALT) + '\t' + str(cate) + '\t' + str(row.LCL5) + '\t' + str(row.LCL6) + '\t' + str(row.LCL7) + '\t' + str(row.LCL8) + '\t' + str(row.TRIO5) + '\t' + str(row.TRIO6) + '\t' + str(mendelian) + '\t' + str(mendelian_count) + '\t' + str(sister_count) + '\n'
+	outline = row.CHROM + '\t' + str(row.POS) + '\t' + row.REF + '\t' + row.ALT + '\t' + cate + '\t' + row.LCL5 + '\t' + row.LCL6 + '\t' + row.LCL7 + '\t' + row.LCL8 + '\t' + str(row.TRIO5) + '\t' + str(row.TRIO6) + '\t' + str(mendelian) + '\t' + str(mendelian_count) + '\t' + str(sister_count) + '\n'
 	family_file.write(outline)
 	if cate == 'SNV':
 		if sister_count == 'yes_same':
